@@ -50,15 +50,15 @@ pipeline {
         }
         success {
             mail to: 'anhthuw.aus2312@gmail.com',
-                 subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                 body: "Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully."
-                 attachLog: true
+                subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
+                body: "Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully."
+                attachLog: true
         }
         failure {
             mail to: 'anhthuw.aus2312@gmail.com',
-                 subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                 body: "Oops! The pipeline ${currentBuild.fullDisplayName} failed. Please check the logs."
-                 attachLog: true
+                subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                body: "Oops! The pipeline ${currentBuild.fullDisplayName} failed. Please check the logs."
+                attachLog: true
         }
     }
 }
