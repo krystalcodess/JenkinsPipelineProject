@@ -12,6 +12,16 @@ pipeline {
             steps {
                 echo 'Running unit and integration tests...'
             }
+            // Highlight start
+            post {
+                always {
+                    emailext subject: "Test Stage Status: ${currentBuild.result}",
+                             body: "The test stage has completed with status: ${currentBuild.result}",
+                             to: "anhthuw.aus2312@gmail.com",
+                             attachLog: true
+                }
+            }
+            // Highlight end
         }
         
         stage('Code Analysis') {
@@ -24,6 +34,16 @@ pipeline {
             steps {
                 echo 'Performing security scan...'
             }
+            // Highlight start
+            post {
+                always {
+                    emailext subject: "Security Scan Status: ${currentBuild.result}",
+                             body: "The security scan stage has completed with status: ${currentBuild.result}",
+                             to: "anhthuw.aus2312@gmail.com",
+                             attachLog: true
+                }
+            }
+            // Highlight end
         }
         
         stage('Deploy to Staging') {
@@ -45,6 +65,7 @@ pipeline {
         }
     }
     
+    // Highlight start
     post {
         success {
             emailext subject: "Pipeline Success",
@@ -59,4 +80,5 @@ pipeline {
                       attachLog: true
         }
     }
+    // Highlight end
 }
