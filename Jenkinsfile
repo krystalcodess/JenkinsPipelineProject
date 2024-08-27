@@ -39,7 +39,7 @@ pipeline {
         }
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to Production...'
+                echo 'Deploying to production server AWS CLI'
                 // Replace with production deployment commands
             }
         }
@@ -49,16 +49,28 @@ pipeline {
             echo 'Pipeline completed.'
         }
         success {
-            mail to: 'anhthuw.aus2312@gmail.com',
-                subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                body: "Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully."
-                attachLog: true
+            script {
+                def jobUrl = env.BUILD_URL
+                mail to: 'anhthuw.aus2312@gmail.com',
+                     subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
+                     body: """
+                        Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully.
+                        
+                        You can view the full log at: ${jobUrl}console
+                     """
+            }
         }
         failure {
-            mail to: 'anhthuw.aus2312@gmail.com',
-                subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                body: "Oops! The pipeline ${currentBuild.fullDisplayName} failed. Please check the logs."
-                attachLog: true
+            script {
+                def jobUrl = env.BUILD_URL
+                mail to: 'anhthuw.aus2312@gmail.com',
+                     subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                     body: """
+                        Oops! The pipeline ${currentBuild.fullDisplayName} failed.
+                        
+                        You can view the full log at: ${jobUrl}console
+                     """
+            }
         }
     }
 }
