@@ -15,16 +15,18 @@ pipeline {
             post {
                 always {
                     script {
-                        def testLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true).trim()
+                        def jobName = env.JOB_NAME
+                        def buildNumber = env.BUILD_NUMBER
+                        def logFile = "${jobName}-${buildNumber}-test.log"
                         
+                        // Capture logs
+                        sh "cp \$JENKINS_HOME/jobs/${jobName}/builds/${buildNumber}/log ${logFile}"
+                        
+                        // Send email with attachment
                         mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Test Stage ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
-                             body: """
-                                The Test stage has ${currentBuild.currentResult}.
-                                
-                                Log output:
-                                ${testLog}
-                             """
+                             subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
+                             body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
+                             attachmentsPattern: "${logFile}"
                     }
                 }
             }
@@ -43,16 +45,18 @@ pipeline {
             post {
                 always {
                     script {
-                        def securityLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true).trim()
+                        def jobName = env.JOB_NAME
+                        def buildNumber = env.BUILD_NUMBER
+                        def logFile = "${jobName}-${buildNumber}-security.log"
                         
+                        // Capture logs
+                        sh "cp \$JENKINS_HOME/jobs/${jobName}/builds/${buildNumber}/log ${logFile}"
+                        
+                        // Send email with attachment
                         mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Security Scan ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
-                             body: """
-                                The Security Scan stage has ${currentBuild.currentResult}.
-                                
-                                Log output:
-                                ${securityLog}
-                             """
+                             subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
+                             body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
+                             attachmentsPattern: "${logFile}"
                     }
                 }
             }
