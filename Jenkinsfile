@@ -19,14 +19,14 @@ pipeline {
                         def buildNumber = env.BUILD_NUMBER
                         def logFile = "${jobName}-${buildNumber}-test.log"
                         
-                        // Capture logs
+                        // Copy the log file
                         sh "cp \$JENKINS_HOME/jobs/${jobName}/builds/${buildNumber}/log ${logFile}"
                         
                         // Send email with attachment
-                        mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
-                             body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
-                             attachmentsPattern: "${logFile}"
+                        emailext attachmentsPattern: "${logFile}",
+                                 subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
+                                 body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
+                                 to: 'anhthuw.aus2312@gmail.com'
                     }
                 }
             }
@@ -49,14 +49,14 @@ pipeline {
                         def buildNumber = env.BUILD_NUMBER
                         def logFile = "${jobName}-${buildNumber}-security.log"
                         
-                        // Capture logs
+                        // Copy the log file
                         sh "cp \$JENKINS_HOME/jobs/${jobName}/builds/${buildNumber}/log ${logFile}"
                         
                         // Send email with attachment
-                        mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
-                             body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
-                             attachmentsPattern: "${logFile}"
+                        emailext attachmentsPattern: "${logFile}",
+                                 subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
+                                 body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
+                                 to: 'anhthuw.aus2312@gmail.com'
                     }
                 }
             }
