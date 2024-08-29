@@ -15,17 +15,15 @@ pipeline {
             post {
                 always {
                     script {
-                        def testLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true)
-                        writeFile file: 'test_log.txt', text: testLog
-                        archiveArtifacts artifacts: 'test_log.txt', fingerprint: true
+                        def testLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true).trim()
                         
                         mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
+                             subject: "Test Stage ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
                              body: """
-                                The Test stage has completed for ${currentBuild.fullDisplayName}.
+                                The Test stage has ${currentBuild.currentResult}.
                                 
-                                You can view the test logs at:
-                                ${env.BUILD_URL}artifact/test_log.txt
+                                Log output:
+                                ${testLog}
                              """
                     }
                 }
@@ -45,17 +43,15 @@ pipeline {
             post {
                 always {
                     script {
-                        def securityLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true)
-                        writeFile file: 'security_log.txt', text: securityLog
-                        archiveArtifacts artifacts: 'security_log.txt', fingerprint: true
+                        def securityLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true).trim()
                         
                         mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
+                             subject: "Security Scan ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
                              body: """
-                                The Security Scan stage has completed for ${currentBuild.fullDisplayName}.
+                                The Security Scan stage has ${currentBuild.currentResult}.
                                 
-                                You can view the security scan logs at:
-                                ${env.BUILD_URL}artifact/security_log.txt
+                                Log output:
+                                ${securityLog}
                              """
                     }
                 }
@@ -87,20 +83,12 @@ pipeline {
         success {
             mail to: 'anhthuw.aus2312@gmail.com',
                  subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                 body: """
-                    Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully.
-                    
-                    You can view the full log at: ${env.BUILD_URL}console
-                 """
+                 body: "Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully."
         }
         failure {
             mail to: 'anhthuw.aus2312@gmail.com',
                  subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                 body: """
-                    Oops! The pipeline ${currentBuild.fullDisplayName} failed.
-                    
-                    You can view the full log at: ${env.BUILD_URL}console
-                 """
+                 body: "Oops! The pipeline ${currentBuild.fullDisplayName} failed."
         }
     }
 }
