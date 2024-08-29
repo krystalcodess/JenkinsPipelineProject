@@ -15,13 +15,13 @@ pipeline {
             post {
                 always {
                     script {
-                        def logContent = Jenkins.instance.getItem(env.JOB_NAME).getBuildByNumber(env.BUILD_NUMBER).getLog(1000)
-                        writeFile file: 'test_logs.txt', text: logContent.join('\n')
-                        
+                        def testLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true)
+                        writeFile file: 'test_log.txt', text: testLog
+                        archiveArtifacts artifacts: 'test_log.txt', fingerprint: true
                         mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Test Stage Completed: ${currentBuild.fullDisplayName}",
-                             body: "The Test stage has completed. Please find the logs attached.",
-                             attachmentsPattern: 'test_logs.txt'
+                             subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
+                             body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
+                             attachmentsPattern: 'test_log.txt'
                     }
                 }
             }
@@ -40,13 +40,13 @@ pipeline {
             post {
                 always {
                     script {
-                        def logContent = Jenkins.instance.getItem(env.JOB_NAME).getBuildByNumber(env.BUILD_NUMBER).getLog(1000)
-                        writeFile file: 'security_scan_logs.txt', text: logContent.join('\n')
-                        
+                        def securityLog = sh(script: 'cat ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', returnStdout: true)
+                        writeFile file: 'security_log.txt', text: securityLog
+                        archiveArtifacts artifacts: 'security_log.txt', fingerprint: true
                         mail to: 'anhthuw.aus2312@gmail.com',
-                             subject: "Security Scan Completed: ${currentBuild.fullDisplayName}",
-                             body: "The Security Scan stage has completed. Please find the logs attached.",
-                             attachmentsPattern: 'security_scan_logs.txt'
+                             subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
+                             body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
+                             attachmentsPattern: 'security_log.txt'
                     }
                 }
             }
@@ -75,28 +75,22 @@ pipeline {
             echo 'Pipeline completed.'
         }
         success {
-            script {
-                def jobUrl = env.BUILD_URL
-                mail to: 'anhthuw.aus2312@gmail.com',
-                     subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                     body: """
-                        Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully.
-                        
-                        You can view the full log at: ${jobUrl}console
-                     """
-            }
+            mail to: 'anhthuw.aus2312@gmail.com',
+                 subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
+                 body: """
+                    Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully.
+                    
+                    You can view the full log at: ${env.BUILD_URL}console
+                 """
         }
         failure {
-            script {
-                def jobUrl = env.BUILD_URL
-                mail to: 'anhthuw.aus2312@gmail.com',
-                     subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                     body: """
-                        Oops! The pipeline ${currentBuild.fullDisplayName} failed.
-                        
-                        You can view the full log at: ${jobUrl}console
-                     """
-            }
+            mail to: 'anhthuw.aus2312@gmail.com',
+                 subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                 body: """
+                    Oops! The pipeline ${currentBuild.fullDisplayName} failed.
+                    
+                    You can view the full log at: ${env.BUILD_URL}console
+                 """
         }
     }
 }
