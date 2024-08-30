@@ -1,75 +1,99 @@
 pipeline {
     agent any
-
-    environment {
-        EMAIL_RECIPIENT = 'anhthuw.aus2312@gmail.com'
-    }
-
     stages {
         stage('Build') {
             steps {
-                echo "Building Code..."
-                sleep 5
+                echo 'Building...'
+                // Replace with actual build command, e.g., 'mvn clean install'
             }
         }
         stage('Unit and Integration Tests') {
             steps {
-                echo "Running unit and integration tests"
-                sleep 5
+                echo 'Running Unit and Integration Tests...'
+                // Replace with actual test command, e.g., 'mvn test'
             }
             post {
                 always {
-                    emailext to: env.EMAIL_RECIPIENT,
-                        subject: "Unit and Integration Tests - ${currentBuild.currentResult}",
-                        body: "Unit and Integration Tests have ${currentBuild.currentResult}.",
-                        attachLog: true
+                    script {
+                        def testLog = currentBuild.rawBuild.getLog(10000).join('\n')
+                        writeFile file: 'test_log.txt', text: testLog
+                        emailext attachmentsPattern: 'test_log.txt',
+                            subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
+                            body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
+                            to: 'anhthuw.aus2312@gmail.com'
+                    }
                 }
             }
         }
         stage('Code Analysis') {
             steps {
-                echo "Performing code analysis"
-                sleep 5
+                echo 'Performing Code Analysis...'
+                // Replace with actual code analysis tool command, e.g., 'sonar-scanner'
             }
         }
         stage('Security Scan') {
             steps {
-                echo "Performing security scan"
-                sleep 5
+                echo 'Performing Security Scan...'
+                // Replace with actual security scan tool command, e.g., 'dependency-check'
             }
             post {
                 always {
-                    emailext to: env.EMAIL_RECIPIENT,
-                        subject: "Security Scan - ${currentBuild.currentResult}",
-                        body: "Security Scan has ${currentBuild.currentResult}.",
-                        attachLog: true
+                    script {
+                        def securityLog = currentBuild.rawBuild.getLog(10000).join('\n')
+                        writeFile file: 'security_log.txt', text: securityLog
+                        emailext attachmentsPattern: 'security_log.txt',
+                            subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
+                            body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
+                            to: 'anhthuw.aus2312@gmail.com'
+                    }
                 }
             }
         }
         stage('Deploy to Staging') {
             steps {
-                echo "Deploying to staging"
-                sleep 5
+                echo 'Deploying to Staging...'
+                // Replace with deployment commands, e.g., 'scp' or 'ssh' commands
             }
         }
         stage('Integration Tests on Staging') {
             steps {
-                echo "Running integration tests on staging"
-                sleep 5
-            }
-            post {
-                always {
-                    emailext to: env.EMAIL_RECIPIENT,
-                        subject: "Staging Tests - ${currentBuild.currentResult}",
-                        body: "Integration Tests on Staging have ${currentBuild.currentResult}.",
-                        attachLog: true
-                }
+                echo 'Running Integration Tests on Staging...'
+                // Replace with staging environment test commands
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo "Deploying to production"
-                sleep 5
+                echo 'Deploying to production server AWS CLI'
+                // Replace with production deployment commands
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+        success {
+            script {
+                def jobUrl = env.BUILD_URL
+                emailext subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
+                    body: """
+                        Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully.
+                        
+                        You can view the full log at: ${jobUrl}console
+                    """,
+                    to: 'anhthuw.aus2312@gmail.com'
+            }
+        }
+        failure {
+            script {
+                def jobUrl = env.BUILD_URL
+                emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                    body: """
+                        Oops! The pipeline ${currentBuild.fullDisplayName} failed.
+                        
+                        You can view the full log at: ${jobUrl}console
+                    """,
+                    to: 'anhthuw.aus2312@gmail.com'
             }
         }
     }
