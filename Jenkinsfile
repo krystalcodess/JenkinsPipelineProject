@@ -1,64 +1,75 @@
 pipeline {
     agent any
-    
+
+    environment {
+        EMAIL_RECIPIENT = 'anhthuw.aus2312@gmail.com'
+    }
+
     stages {
         stage('Build') {
             steps {
-                echo "Build the code using Maven."
+                echo "Building Code..."
+                sleep 5
             }
         }
         stage('Unit and Integration Tests') {
             steps {
-                echo "Running unit tests using Katalon"
+                echo "Running unit and integration tests"
+                sleep 5
             }
             post {
-                success {
-                    mail to: "anhthuw.aus2312@gmail.com",
-                    subject: "Unit and Integration Tests Result",
-                    body: "Unit and Integration Tests succeeded"
-                }
-                failure {
-                    mail to: "anhthuw.aus2312@gmail.com",
-                    subject: "Unit and Integration Tests Result",
-                    body: "Unit and Integration Tests failed"
+                always {
+                    emailext to: env.EMAIL_RECIPIENT,
+                        subject: "Unit and Integration Tests - ${currentBuild.currentResult}",
+                        body: "Unit and Integration Tests have ${currentBuild.currentResult}.",
+                        attachLog: true
                 }
             }
         }
         stage('Code Analysis') {
             steps {
-                echo "Analyse the code and ensure it meets industry standards using Sonar"
+                echo "Performing code analysis"
+                sleep 5
             }
         }
         stage('Security Scan') {
             steps {
-                echo "Perform a security scan on the code using OWASP"
+                echo "Performing security scan"
+                sleep 5
             }
             post {
-                success {
-                    mail to: "anhthuw.aus2312@gmail.com",
-                    subject: "Security Scan Result",
-                    body: "Security Scan succeeded"
-                }
-                failure {
-                    mail to: "anhthuw.aus2312@gmail.com",
-                    subject: "Security Scan Result",
-                    body: "Security Scan failed"
+                always {
+                    emailext to: env.EMAIL_RECIPIENT,
+                        subject: "Security Scan - ${currentBuild.currentResult}",
+                        body: "Security Scan has ${currentBuild.currentResult}.",
+                        attachLog: true
                 }
             }
         }
         stage('Deploy to Staging') {
             steps {
-                echo "Deploy the application to an AWS EC2 server"
+                echo "Deploying to staging"
+                sleep 5
             }
         }
         stage('Integration Tests on Staging') {
             steps {
-                echo "Run integration tests on the staging environment using Citrus"
+                echo "Running integration tests on staging"
+                sleep 5
+            }
+            post {
+                always {
+                    emailext to: env.EMAIL_RECIPIENT,
+                        subject: "Staging Tests - ${currentBuild.currentResult}",
+                        body: "Integration Tests on Staging have ${currentBuild.currentResult}.",
+                        attachLog: true
+                }
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo "Deploy the application to the AWS EC2 server"
+                echo "Deploying to production"
+                sleep 5
             }
         }
     }
