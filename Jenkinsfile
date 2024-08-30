@@ -9,16 +9,12 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the project using Maven...'
-                // Add actual build command here, e.g.:
-                // sh 'mvn clean package'
             }
         }
         
         stage('Unit and Integration Tests') {
             steps {
                 echo 'Running unit and integration tests using JUnit...'
-                // Add actual test command here, e.g.:
-                // sh 'mvn test'
             }
             post {
                 always {
@@ -36,8 +32,6 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 echo 'Performing code analysis with SonarQube...'
-                // Add actual SonarQube analysis command here, e.g.:
-                // sh 'mvn sonar:sonar'
             }
         }
         
@@ -63,24 +57,18 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 echo 'Deploying the application to AWS EC2 Staging...'
-                // Add actual deployment command here, e.g.:
-                // sh 'ansible-playbook deploy-staging.yml'
             }
         }
         
         stage('Integration Tests on Staging') {
             steps {
                 echo 'Running integration tests on Staging environment...'
-                // Add actual integration test command here, e.g.:
-                // sh 'mvn verify -Pintegration-tests'
             }
         }
         
         stage('Deploy to Production') {
             steps {
                 echo 'Deploying the application to AWS EC2 Production...'
-                // Add actual production deployment command here, e.g.:
-                // sh 'ansible-playbook deploy-production.yml'
             }
         }
     }
