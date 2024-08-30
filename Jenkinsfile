@@ -25,7 +25,6 @@ pipeline {
                                 subject: "Jenkins Pipeline: Unit and Integration Tests - ${currentBuild.currentResult}",
                                 body: "The Unit and Integration Tests stage has completed with status: ${currentBuild.currentResult}.\n\nBuild URL: ${env.BUILD_URL}",
                                 attachLog: true,
-                                compressLog: true,
                                 to: env.EMAIL_RECIPIENT
                             )
                             echo "Email sent successfully. Result: ${emailResult}"
@@ -57,7 +56,6 @@ pipeline {
                                 subject: "Jenkins Pipeline: Security Scan - ${currentBuild.currentResult}",
                                 body: "The Security Scan stage has completed with status: ${currentBuild.currentResult}.\n\nBuild URL: ${env.BUILD_URL}",
                                 attachLog: true,
-                                compressLog: true,
                                 to: env.EMAIL_RECIPIENT
                             )
                             echo "Email sent successfully. Result: ${emailResult}"
@@ -105,7 +103,6 @@ pipeline {
                         subject: "Jenkins Pipeline: Overall Build Failed - ${currentBuild.fullDisplayName}",
                         body: "The pipeline has failed. Please check the console output for details.\n\nBuild URL: ${env.BUILD_URL}",
                         attachLog: true,
-                        compressLog: true,
                         to: env.EMAIL_RECIPIENT
                     )
                     echo "Email sent successfully. Result: ${emailResult}"
