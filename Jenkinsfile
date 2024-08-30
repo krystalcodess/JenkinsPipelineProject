@@ -1,98 +1,104 @@
 pipeline {
     agent any
+    
+    environment {
+        EMAIL_RECIPIENT = 'anhthuw.aus2312@gmail.com'
+    }
+    
     stages {
         stage('Build') {
             steps {
-                echo 'Building...'
-                // Replace with actual build command, e.g., 'mvn clean install'
+                echo 'Building the project using Maven...'
+                // Add actual build command here, e.g.:
+                // sh 'mvn clean package'
             }
         }
+        
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Running Unit and Integration Tests...'
-                // Replace with actual test command, e.g., 'mvn test'
+                echo 'Running unit and integration tests using JUnit...'
+                // Add actual test command here, e.g.:
+                // sh 'mvn test'
             }
             post {
                 always {
                     script {
-                        def jobName = env.JOB_NAME
-                        def buildNumber = env.BUILD_NUMBER
-                        def logFile = "${jobName}-${buildNumber}-test.log"
-                        
-                        // Copy the log file
-                        sh "cp \$JENKINS_HOME/jobs/${jobName}/builds/${buildNumber}/log ${logFile}"
-                        
-                        // Send email with attachment
-                        emailext attachmentsPattern: "${logFile}",
-                                 subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
-                                 body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
-                                 to: 'anhthuw.aus2312@gmail.com'
+                        emailext subject: "Jenkins Pipeline: Unit and Integration Tests - ${currentBuild.currentResult}",
+                                body: "The Unit and Integration Tests stage has completed with status: ${currentBuild.currentResult}.\n\nBuild URL: ${env.BUILD_URL}",
+                                attachLog: true,
+                                compressLog: true,
+                                to: env.EMAIL_RECIPIENT
                     }
                 }
             }
         }
+        
         stage('Code Analysis') {
             steps {
-                echo 'Performing Code Analysis...'
-                // Replace with actual code analysis tool command, e.g., 'sonar-scanner'
+                echo 'Performing code analysis with SonarQube...'
+                // Add actual SonarQube analysis command here, e.g.:
+                // sh 'mvn sonar:sonar'
             }
         }
+        
         stage('Security Scan') {
             steps {
-                echo 'Performing Security Scan...'
-                // Replace with actual security scan tool command, e.g., 'dependency-check'
+                echo 'Performing security scan with Snyk Code...'
+                // Add actual Snyk scan command here, e.g.:
+                // sh 'snyk test'
             }
             post {
                 always {
                     script {
-                        def jobName = env.JOB_NAME
-                        def buildNumber = env.BUILD_NUMBER
-                        def logFile = "${jobName}-${buildNumber}-security.log"
-                        
-                        // Copy the log file
-                        sh "cp \$JENKINS_HOME/jobs/${jobName}/builds/${buildNumber}/log ${logFile}"
-                        
-                        // Send email with attachment
-                        emailext attachmentsPattern: "${logFile}",
-                                 subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
-                                 body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
-                                 to: 'anhthuw.aus2312@gmail.com'
+                        emailext subject: "Jenkins Pipeline: Security Scan - ${currentBuild.currentResult}",
+                                body: "The Security Scan stage has completed with status: ${currentBuild.currentResult}.\n\nBuild URL: ${env.BUILD_URL}",
+                                attachLog: true,
+                                compressLog: true,
+                                to: env.EMAIL_RECIPIENT
                     }
                 }
             }
         }
+        
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to Staging...'
-                // Replace with deployment commands, e.g., 'scp' or 'ssh' commands
+                echo 'Deploying the application to AWS EC2 Staging...'
+                // Add actual deployment command here, e.g.:
+                // sh 'ansible-playbook deploy-staging.yml'
             }
         }
+        
         stage('Integration Tests on Staging') {
             steps {
-                echo 'Running Integration Tests on Staging...'
-                // Replace with staging environment test commands
+                echo 'Running integration tests on Staging environment...'
+                // Add actual integration test command here, e.g.:
+                // sh 'mvn verify -Pintegration-tests'
             }
         }
+        
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to production server AWS CLI'
-                // Replace with production deployment commands
+                echo 'Deploying the application to AWS EC2 Production...'
+                // Add actual production deployment command here, e.g.:
+                // sh 'ansible-playbook deploy-production.yml'
             }
         }
     }
+    
     post {
         always {
-            echo 'Pipeline completed.'
+            echo 'Pipeline execution completed.'
         }
         success {
-            mail to: 'anhthuw.aus2312@gmail.com',
-                 subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                 body: "Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully."
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            mail to: 'anhthuw.aus2312@gmail.com',
-                 subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                 body: "Oops! The pipeline ${currentBuild.fullDisplayName} failed."
+            echo 'Pipeline execution failed.'
+            emailext subject: "Jenkins Pipeline: Overall Build Failed - ${currentBuild.fullDisplayName}",
+                    body: "The pipeline has failed. Please check the console output for details.\n\nBuild URL: ${env.BUILD_URL}",
+                    attachLog: true,
+                    compressLog: true,
+                    to: env.EMAIL_RECIPIENT
         }
     }
 }
