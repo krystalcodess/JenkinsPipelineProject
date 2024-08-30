@@ -1,100 +1,80 @@
 pipeline {
     agent any
+
     stages {
         stage('Build') {
             steps {
-                echo 'Building...'
-                // Replace with actual build command, e.g., 'mvn clean install'
+                echo 'Building the project using Maven'
             }
         }
+        
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Running Unit and Integration Tests...'
-                // Replace with actual test command, e.g., 'mvn test'
+                echo 'Running unit and integration tests using JUnit'
             }
             post {
-                always {
-                    script {
-                        def testLog = currentBuild.rawBuild.getLog(10000).join('\n')
-                        writeFile file: 'test_log.txt', text: testLog
-                        emailext attachmentsPattern: 'test_log.txt',
-                            subject: "Test Stage Results: ${currentBuild.fullDisplayName}",
-                            body: "Please find attached the logs for the Test stage of ${currentBuild.fullDisplayName}.",
-                            to: 'anhthuw.aus2312@gmail.com'
-                    }
+                success {
+                    emailext subject: "[SIT223] Jenkins Pipeline: Unit and Integration Tests Stage - ${currentBuild.currentResult}",
+                            body: "The Unit and Integration Tests stage has completed with status: ${currentBuild.currentResult}",
+                            attachLog: true,
+                            to: "anhthuw.aus2312@gmail.com"
                 }
+                failure {
+                    emailext subject: "[SIT223] Jenkins Pipeline: Unit and Integration Tests Stage - ${currentBuild.currentResult}",
+                            body: "The Unit and Integration tests failed. ${currentBuild.currentResult}",
+                            attachLog: true,
+                            to: "anhthuw.aus2312@gmail.com"
+                }
+                
             }
         }
+        
         stage('Code Analysis') {
             steps {
-                echo 'Performing Code Analysis...'
-                // Replace with actual code analysis tool command, e.g., 'sonar-scanner'
+                echo 'Performing code analysis with SonarQube in jenkins'
             }
         }
+        
         stage('Security Scan') {
             steps {
-                echo 'Performing Security Scan...'
-                // Replace with actual security scan tool command, e.g., 'dependency-check'
+                 echo 'Performing security scan with Snyk Code'
             }
+            
             post {
-                always {
-                    script {
-                        def securityLog = currentBuild.rawBuild.getLog(10000).join('\n')
-                        writeFile file: 'security_log.txt', text: securityLog
-                        emailext attachmentsPattern: 'security_log.txt',
-                            subject: "Security Scan Results: ${currentBuild.fullDisplayName}",
-                            body: "Please find attached the logs for the Security Scan stage of ${currentBuild.fullDisplayName}.",
-                            to: 'anhthuw.aus2312@gmail.com'
-                    }
+                success {
+                    emailext subject: "[SIT223] Jenkins Security Scan Notification - ${currentBuild.currentResult}",
+                            body: "The Security Scan stage has completed with status: ${currentBuild.currentResult}.",
+                            attachLog: true,
+                            to: "anhthuw.aus2312@gmail.com"
                 }
+                failure {
+                    emailext subject: "Jenkins Security Scan notification - ${currentBuild.currentResult}",
+                            body: "Security Scan failed. ${currentBuild.currentResult}",
+                            attachLog: true,
+                            to: "anhthuw.aus2312@gmail.com"
+                }
+                
             }
         }
+        
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to Staging...'
-                // Replace with deployment commands, e.g., 'scp' or 'ssh' commands
+                echo 'Deploying the application to AWS EC2 Staging'
             }
         }
+        
         stage('Integration Tests on Staging') {
             steps {
-                echo 'Running Integration Tests on Staging...'
-                // Replace with staging environment test commands
+                echo 'Running integration tests on Staging using Maven'
             }
         }
+        
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to production server AWS CLI'
-                // Replace with production deployment commands
+                echo 'Deploying the application to AWS EC2 Production'
             }
         }
     }
-    post {
-        always {
-            echo 'Pipeline completed.'
-        }
-        success {
-            script {
-                def jobUrl = env.BUILD_URL
-                emailext subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                    body: """
-                        Good news! The pipeline ${currentBuild.fullDisplayName} completed successfully.
-                        
-                        You can view the full log at: ${jobUrl}console
-                    """,
-                    to: 'anhthuw.aus2312@gmail.com'
-            }
-        }
-        failure {
-            script {
-                def jobUrl = env.BUILD_URL
-                emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                    body: """
-                        Oops! The pipeline ${currentBuild.fullDisplayName} failed.
-                        
-                        You can view the full log at: ${jobUrl}console
-                    """,
-                    to: 'anhthuw.aus2312@gmail.com'
-            }
-        }
-    }
+
+     
 }
