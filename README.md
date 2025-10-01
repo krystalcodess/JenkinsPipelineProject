@@ -94,26 +94,12 @@ Launch separate instances for staging and production
 Install Docker and Docker Compose
 Configure security groups
 
-
 Run Pipeline
 
 Push code to GitHub
 Jenkins automatically triggers pipeline
 Monitor build progress in Jenkins dashboard
 
-
-
-📁 Project Structure
-nutrisync/
-├── Jenkinsfile
-├── Dockerfile
-├── docker-compose.yml
-├── docker-compose.prod.yml
-├── requirements.txt
-├── app/
-│   └── main.py
-└── tests/
-    └── test_main.py
 🧪 Testing
 Run tests locally:
 bashpytest tests/
